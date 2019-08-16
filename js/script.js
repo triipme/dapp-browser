@@ -98,6 +98,7 @@ $( document ).ready(function() {
 
   topUpBtnEl.on('click', function(){
     topUpResultSectionEl.html('');
+    topUpBtnEl.attr('disabled', 'disabled').text('Processing...');
 
     if(userWalletAddress == ''){
       return;
@@ -121,6 +122,7 @@ $( document ).ready(function() {
       data: topupContract.purchase.getData(userWalletAddress)
     }, function (error, hash) {
       if (error) {
+        topUpBtnEl.attr('disabled', false).text('Submit');
         topUpResultSectionEl.html(error.message ? error.message : error);
         return;
       }
@@ -129,7 +131,7 @@ $( document ).ready(function() {
         web3.eth.getTransactionReceipt(hash, function(error, ret) {
           if (ret && !error) {
             clearInterval(intv);
-            console.log(hash, ret);
+            // console.log(hash, ret);
 
             topUpSectionEl.hide();
             successSectionEl.show();
