@@ -5,7 +5,7 @@
 // https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-methods
 var config = {
   api: {
-    getInfoByEmail: { url: 'https://triip.me/api/dapp_browser/info' }
+    getInfoByEmail: { url: 'https://www.triip.me/api/dapp_browser/info' }
   },
   gasLimit: 2100000,
   gasPrice: 300000000,
