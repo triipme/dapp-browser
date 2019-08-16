@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta content="Wisepass - A lifestyle membership powered by AI so you can always have a good time in more than 300 restaurants, clubs, hotels and bars in Ho Chi Minh City, Hanoi, Bangkok, and Manila" name="description">
+  <title>Topup TIIM with TOMO</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="shortcut icon" type="image/x-icon" href="https://www.triip.me/assets/img/favicon.png" />
+  <link href=' https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div class="container-fluid" id="mainContainer">
+    <br/>
+    <br/>
+    <div class="row justify-content-center" id="validateEmailSection">
+      <div class="col-12">
+        <div class="logo-info text-center">
+          <img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon">
+        </div>
+        <h3 class="text-center">Topup TIIM</h3>
+        <p class="text-center">Some note here</p>
+
+        <div class="form-group has-error">
+          <input type="email" id='email' class="form-control form-control-lg text-center" placeholder="type your email here..." value="dtthaison@gmail.com">
+          <div id="validateEmailResultSection" class="form-control-feedback text-center"></div>
+        </div>
+
+        <div class="form-group">
+          <button id='validateEmailBtn' class="btn btn-primary btn-block btn-lg">Submit</button>
+        </div>
+
+        <p class="text-center">Not a triip member yet? Download our app and register an account now!</p>
+        <div class="row justify-content-center text-center">
+          <div class="col-6">
+            <a href="https://play.google.com/store/apps/details?id=me.triip.mobile" class="apps-craft-btn play-store-btn"><img src="https://www.triip.me/images/google-play.png" alt="icon"></a>
+          </div>
+
+          <div class="col-6">
+            <a href="https://appsto.re/us/9D6Cfb.i" class="apps-craft-btn app-store-btn"><img src="https://www.triip.me/images/appstore.png" alt="icon"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center" id="topUpSection" style="display: none;">
+      <div class="col-12">
+        <div class="logo-info text-center">
+          <img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon">
+        </div>
+        <h3 class="text-center">Topup TIIM</h3>
+
+        <br/>
+        <div class="text-center">
+          <span>Your TOMO balance:</span>
+          <br/>
+          <span><span id="yourBalance"></span> TOMO</span>
+          <!-- <br/>
+          <span><span id="yourTIIMBalance"></span> TIIM</span> -->
+        </div>
+
+        <br/>
+        <div class="text-center">
+          <span>Your TIIM balance on triip.me</span>
+          <br/>
+          <span><span id="userTIIMBalance"></span> TIIM</span>
+        </div>
+
+        <br/>
+        <div class="text-center">
+          <span>Current rate 1 TOMO = <span id="rate"></span> TIIM</span>
+          <br/>
+          <span>Minimum top up <span id="minimum"></span> TOMO</span>
+        </div>
+
+        <br/>
+        <div class="form-group has-error">
+          <!-- <input type="tel" id='topUpAmount' class="form-control form-control-lg"> -->
+          <div class="col-auto">
+            <div class="input-group mb-2">
+              <input type="tel" class="form-control text-right" id="topUpAmount" placeholder="amount" />
+              <div class="input-group-append">
+                <div class="input-group-text">TOMO&nbsp;=&nbsp;<span id="tiimAmount" rate="0"></span>&nbsp;TIIM</div>
+              </div>
+            </div>
+            <div id="topUpResultSection" class="form-control-feedback text-center"></div>
+          </div>
+        </div>
+
+        <br/>
+        <div class="form-group">
+          <button id='topUpBtn' class="btn btn-primary btn-block btn-lg" disabled="disabled">Submit</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row justify-content-center text-center" id="successSection" style="display: none;">
+      <div class="col-12">
+        <div class="logo-info text-center">
+          <img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon">
+        </div>
+        <br/>
+        <h3 class="text-center">
+          Success! Please check your balance on triip app
+          <br/>
+        </h3>
+        <br/>
+        <br/>
+        <a id="txUrl" href="#">Check your transaction on Tomo scan</a>
+        <br/>
+        <br/>
+        <a href="/">Continue to top up</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="./js/erc20_abi.js"></script>
+  <script src="./js/top_up_tiim_abi.js"></script>
+  <script src="./js/script.js"></script>
+</body>
+</html>
