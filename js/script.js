@@ -35,7 +35,6 @@ $( document ).ready(function() {
     config.tiimContract.address = env[envVal].tiimContractAddress;
     config.topUpContract.address = env[envVal].topUpContractAddress;
   }
-  console.log(config);
 
   var tiimContract = null;
   var emailEl = $('#email');
