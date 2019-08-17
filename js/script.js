@@ -1,12 +1,12 @@
 // https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-methods
 var env = {
   prod: {
-    getInfoByEmailApi: 'https://www.triip.me/api/dapp_browser/info',
+    apiUrl: 'https://www.triip.me/api/dapp_browser',
     tiimContractAddress: '0x4f7239c38d73a6cba675a3023cf84b304f6daef6',
     topUpContractAddress: '0x689d961b4025c92201a837b2c175e3f16bed38a6'
   },
   stag: {
-    getInfoByEmailApi: 'https://staging.triip.me/api/dapp_browser/info',
+    apiUrl: 'https://staging.triip.me/api/dapp_browser',
     tiimContractAddress: '0x9e2b6a4b95a02afa43e59963c062b8daa07dc20a',
     topUpContractAddress: '0x05066b36e7a93322c34affa06c3822cac7321b8d'
   },
@@ -14,7 +14,9 @@ var env = {
 
 var config = {
   api: {
-    getInfoByEmail: { url: env.prod.getInfoByEmailApi }
+    url: env.prod.apiUrl,
+    getInfoByEmail: { path: '/info' },
+    topUp: { path: '/top_up' }
   },
   gasLimit: 2100000,
   gasPrice: 300000000,
@@ -31,11 +33,12 @@ var config = {
 $( document ).ready(function() {
   var envVal = location.href.getValueByKey('env');
   if (location.href.getValueByKey('env') == 'stag') {
-    config.api.getInfoByEmail.url = env[envVal].getInfoByEmailApi;
+    config.api.url = env[envVal].apiUrl;
     config.tiimContract.address = env[envVal].tiimContractAddress;
     config.topUpContract.address = env[envVal].topUpContractAddress;
   }
 
+  var user = null;
   var tiimContract = null;
   var emailEl = $('#email');
   var validateEmailSectionEl = $('#validateEmailSection');
@@ -77,18 +80,18 @@ $( document ).ready(function() {
     var $this = $(this);
     validateEmailResultSectionEl.html('');
     $this.attr('disabled', 'disabled').text('Processing...');
-
     var email = emailEl.val();
 
     $.ajax({
       type: "POST",
-      url: config.api.getInfoByEmail.url,
+      url: config.api.url + config.api.getInfoByEmail.path,
       data: { email: email },
       success: function(resp){
         validateEmailSectionEl.hide();
         topUpSectionEl.show();
 
-        userWalletAddress = resp.data.wallet_address;
+        user = resp.data;
+        userWalletAddress = user.wallet_address;
         localStorage.setItem("userEmail", email);
 
         web3.eth.getBalance(web3.eth.defaultAccount, function(error, b) {
@@ -117,6 +120,7 @@ $( document ).ready(function() {
             // topUpAmountEl.val(minimumVal);
             // topUpAmountEl.trigger('change');
             topUpBtnEl.attr('disabled', false);
+            topUpAmountEl.focus();
           });
         });
         $this.attr('disabled', false).text('Submit');
@@ -139,29 +143,55 @@ $( document ).ready(function() {
   function topUpError(error){
     topUpBtnEl.attr('disabled', false).text('Submit');
     topUpResultSectionEl.html(error.message ? error.message : error);
+    topUpAmountEl.focus();
+  }
+
+  function topUpValValid() {
+    var minimumErrorMsg = 'Top up amount must be greater than or equal to ' + minimumVal.format(2, 3, ',', '.') + ' TOMO';
+
+    if(topUpAmountEl.val() == '') {
+      return 'Please enter top up amount<br/>'+minimumErrorMsg;
+    }
+
+    var topUpVal = parseFloat(topUpAmountEl.val());
+    if(isNaN(topUpVal)) {
+      return 'Please enter top up amount correctly<br/>'+minimumErrorMsg;
+    }
+
+    if(topUpVal < minimumVal) {
+      return totalAmount < minimumVal ? ('You dont have enough TOMO<br/>' + minimumErrorMsg) : minimumErrorMsg;
+    }
+
+    if(totalAmount < topUpVal) {
+      return 'You dont have enough TOMO<br/>Top up amount should be less than or equal to your balance(' + totalAmount.format(2, 3, ',', '.') + ' TOMO)';
+    }
+
+    return '';
+  }
+
+  function resourceValid() {
+    if(userWalletAddress == ''){
+      return 'Invalid user wallet address';
+    }
+    if(tiimContract == null) {
+      return 'Can not connect contract';
+    }
+
+    return topUpValValid();
   }
 
   topUpBtnEl.on('click', function(){
     topUpResultSectionEl.html('');
     topUpBtnEl.attr('disabled', 'disabled').text('Processing...');
 
-    if(userWalletAddress == ''){
-      topUpError('Invalid user wallet address');
-      return;
-    }
-
-    if(tiimContract == null) {
-      topUpError('Something went wrong');
-      return
-    }
-
-    var topUpVal = parseFloat(topUpAmountEl.val());
-    if(isNaN(topUpVal) || topUpVal < minimumVal) {
-      topUpError('You dont have enough TOMO');
+    var errorMsg = resourceValid();
+    if(errorMsg != '') {
+      topUpError(errorMsg);
       return
     }
 
     var topupContract = web3.eth.contract(config.topUpContract.abi).at(config.topUpContract.address);
+    var topUpVal = parseFloat(topUpAmountEl.val());
     var topUpAmount = web3.toBigNumber(topUpVal).mul(1e+18).toNumber();
 
     web3.eth.sendTransaction({
@@ -187,6 +217,14 @@ $( document ).ready(function() {
             successSectionEl.show();
             txUrlEl.attr('href', 'https://scan.tomochain.com/txs/' + hash);
             // confirm send
+            $.ajax({
+              type: "POST",
+              url: config.api.url + config.api.topUp.path,
+              data: { tx: hash, user_id: user.id },
+              success: function(resp){},
+              error: function(xhr, _){},
+              dataType: 'json'
+            });
           }
         });
       }, 3000);
