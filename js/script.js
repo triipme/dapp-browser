@@ -37,9 +37,31 @@ $( document ).ready(function() {
   var topUpBtnEl = $('#topUpBtn');
   var successSectionEl = $('#successSection');
   var txUrlEl = $('#txUrl');
+  var minimumVal = 10;
+  var totalAmount = 0;
+
+  emailEl.val(localStorage.getItem("userEmail"));
+  emailEl.focus();
+
+  $('#clearEmailBtn').on('click', function(){
+    emailEl.val('').focus();
+  });
+
+  $('.topUpAmountBtn').on('click', function(){
+    var val = $(this).val();
+    var amount = val == "" ? minimumVal : parseInt((totalAmount * (parseFloat(val) / 100.0)) + 0.5);
+    if(amount < minimumVal) {
+      amount = minimumVal;
+    }
+    $(topUpAmountEl).val(amount);
+    $(topUpAmountEl).trigger('change');
+  });
 
   $('#validateEmailBtn').on('click', function(){
+    var $this = $(this);
     validateEmailResultSectionEl.html('');
+    $this.attr('disabled', 'disabled').text('Processing...');
+
     var email = emailEl.val();
 
     $.ajax({
@@ -51,9 +73,11 @@ $( document ).ready(function() {
         topUpSectionEl.show();
 
         userWalletAddress = resp.data.wallet_address;
+        localStorage.setItem("userEmail", email);
 
         web3.eth.getBalance(web3.eth.defaultAccount, function(error, b) {
-          yourTomoBalanceEl.text(web3.toBigNumber(b).dividedBy(1e+18).toString());
+          totalAmount = web3.toBigNumber(b).dividedBy(1e+18).toNumber()
+          yourTomoBalanceEl.text(totalAmount);
         });
 
         tiimContract = web3.eth.contract(config.tiimContract.abi).at(config.tiimContract.address);
@@ -72,17 +96,17 @@ $( document ).ready(function() {
           tiimAmountEl.attr('rate', rate);
 
           topupContract.minimum(function(error, b){
-            var val = web3.toBigNumber(b).dividedBy(1e+18).toString();
-            minimumEl.text(val);
-            // topUpAmountEl.val(val);
-            topUpAmountEl.trigger('change');
+            minimumVal = web3.toBigNumber(b).dividedBy(1e+18).toNumber();
+            minimumEl.text(minimumVal);
+            // topUpAmountEl.val(minimumVal);
+            // topUpAmountEl.trigger('change');
             topUpBtnEl.attr('disabled', false);
           });
         });
-
-        topUpAmount.focus();
+        $this.attr('disabled', false).text('Submit');
       },
       error: function(xhr, _){
+        $this.attr('disabled', false).text('Submit');
         validateEmailResultSectionEl.html(xhr.responseJSON.message);
       },
       dataType: 'json'
@@ -96,22 +120,33 @@ $( document ).ready(function() {
     tiimAmountEl.text(isNaN(tiimAmount) ? 0 : tiimAmount);
   });
 
+  function topUpError(error){
+    topUpBtnEl.attr('disabled', false).text('Submit');
+    topUpResultSectionEl.html(error.message ? error.message : error);
+  }
+
   topUpBtnEl.on('click', function(){
     topUpResultSectionEl.html('');
     topUpBtnEl.attr('disabled', 'disabled').text('Processing...');
 
     if(userWalletAddress == ''){
+      topUpError('Invalid user wallet address');
       return;
     }
 
     if(tiimContract == null) {
+      topUpError('Something went wrong');
       return
     }
 
-    var amount = web3.toBigNumber(1.5).mul(1e+18).toNumber();
-    var topUpAmount = web3.toBigNumber(parseFloat(topUpAmountEl.val())).mul(1e+18).toNumber();
+    var topUpVal = parseFloat(topUpAmountEl.val());
+    if(isNaN(topUpVal) || topUpVal < minimumVal) {
+      topUpError('You dont have enough TOMO');
+      return
+    }
 
     var topupContract = web3.eth.contract(config.topUpContract.abi).at(config.topUpContract.address);
+    var topUpAmount = web3.toBigNumber(topUpVal).mul(1e+18).toNumber();
 
     web3.eth.sendTransaction({
       from: web3.eth.defaultAccount,
@@ -122,8 +157,7 @@ $( document ).ready(function() {
       data: topupContract.purchase.getData(userWalletAddress)
     }, function (error, hash) {
       if (error) {
-        topUpBtnEl.attr('disabled', false).text('Submit');
-        topUpResultSectionEl.html(error.message ? error.message : error);
+        topUpError(error);
         return;
       }
 
