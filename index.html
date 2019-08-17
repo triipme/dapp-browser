@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="shortcut icon" type="image/x-icon" href="https://www.triip.me/images/triip_tiim_logo.png" />
   <link href=' https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="./css/style.css?v=0.2.0">
+  <link rel="stylesheet" href="./css/style.css?v=0.3.0">
 </head>
 <body>
   <div class="container-fluid" id="mainContainer">
@@ -22,7 +22,7 @@
 
         <div class="form-group">
           <div class="input-group mb-3">
-            <input type="email" id='email' class="form-control form-control-lg text-center" placeholder="type your email here..." value="" autofocus>
+            <input type="email" id='email' class="form-control form-control-lg text-center" placeholder="Type Triip account email here..." value="" autofocus>
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" type="button" id="clearEmailBtn">Clear</button>
             </div>
@@ -66,7 +66,7 @@
         <div class="text-center">
           <span>Your TIIM balance on triip.me:</span>
           <br/>
-          <span><span id="userTIIMBalance"></span> TIIM</span>
+          <span class="text-danger"><span id="userTIIMBalance"></span> TIIM</span>
         </div>
 
         <br/>
@@ -129,6 +129,6 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script src="./js/erc20_abi.js"></script>
   <script src="./js/top_up_tiim_abi.js"></script>
-  <script src="./js/script.js?v=0.2.0"></script>
+  <script src="./js/script.js?v=0.3.0"></script>
 </body>
 </html>
