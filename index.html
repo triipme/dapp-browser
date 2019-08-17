@@ -15,7 +15,7 @@
     <div class="row justify-content-center" id="validateEmailSection">
       <div class="col-12">
         <div class="logo-info text-center">
-          <img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon">
+          <a href="#" target="_top"><img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon"></a>
         </div>
         <h3 class="text-center section-title">TIIM Topup</h3>
         <p class="text-center">Convert TOMO to TIIM to enjoy best hotel price on the internet, exclusive deals directly from local travel partners and surprise gifts occasionally.</p>
@@ -37,36 +37,34 @@
         <p class="text-center">Not a triip member yet? Download our app and register an account now!</p>
         <div class="row justify-content-center text-center">
           <div class="col-6">
-            <a href="https://play.google.com/store/apps/details?id=me.triip.mobile" class="apps-craft-btn play-store-btn"><img src="https://www.triip.me/images/google-play.png" alt="icon"></a>
+            <a href="https://www.triip.app" class="apps-craft-btn play-store-btn"><img src="https://www.triip.me/images/google-play.png" alt="icon"></a>
           </div>
 
           <div class="col-6">
-            <a href="https://appsto.re/us/9D6Cfb.i" class="apps-craft-btn app-store-btn"><img src="https://www.triip.me/images/appstore.png" alt="icon"></a>
+            <a href="https://www.triip.app" class="apps-craft-btn app-store-btn"><img src="https://www.triip.me/images/appstore.png" alt="icon"></a>
           </div>
         </div>
+        <br/>
+        <p class="text-center">Need help? We are one email away <a href="#" id="mailToContact">contact@triip.me</a></p>
       </div>
     </div>
 
     <div class="row justify-content-center" id="topUpSection" style="display: none;">
       <div class="col-12">
         <div class="logo-info text-center">
-          <img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon">
+          <a href="#" target="_top"><img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon"></a>
         </div>
         <h3 class="text-center section-title">TIIM Topup</h3>
         <br/>
         <div class="text-center">
           <span>Your TOMO balance:</span>
-          <br/>
-          <span><span id="yourBalance"></span> TOMO</span>
+          <strong><span id="yourBalance"></span> TOMO</strong>
           <!-- <br/>
           <span><span id="yourTIIMBalance"></span> TIIM</span> -->
         </div>
-
-        <br/>
         <div class="text-center">
           <span>Your TIIM balance on triip.me:</span>
-          <br/>
-          <span class="text-danger"><span id="userTIIMBalance"></span> TIIM</span>
+          <strong class="text-danger"><span id="userTIIMBalance"></span> TIIM</strong>
         </div>
 
         <br/>
@@ -100,27 +98,32 @@
 
         <div class="form-group">
           <button id='topUpBtn' class="btn btn-primary btn-block btn-lg" disabled="disabled">Submit</button>
-          <a href="/" class="btn btn-outline-secondary btn-block">Back</a>
+          <button href="/" class="btn btn-outline-secondary btn-block" id="topUpBackBtn">Back</button>
         </div>
       </div>
+
+      <br/>
+      <p class="text-center">Need help? We are one email away <a href="#" id="mailToContact">contact@triip.me</a></p>
     </div>
 
     <div class="row justify-content-center text-center" id="successSection" style="display: none;">
       <div class="col-12">
         <div class="logo-info text-center">
-          <img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon">
+          <a href="#" target="_top"><img src="https://www.triip.me/images/triip_tiim_logo.png" alt="icon"></a>
         </div>
         <br/>
-        <h3 class="text-center section-title">
-          Success! Please check your balance on triip app
-          <br/>
-        </h3>
+        <h4 class="text-center section-title">
+          Success! Please check your balance on <a href="https://www.triip.app">triip.me</a>
+        </h4>
         <br/>
         <br/>
         <a id="txUrl" href="#">Check your transaction on Tomo scan</a>
         <br/>
         <br/>
         <a href="/">Continue to top up</a>
+        <br/>
+        <br/>
+        <p class="text-center">Need help? We are one email away <a href="#" id="mailToContact">contact@triip.me</a></p>
       </div>
     </div>
   </div>

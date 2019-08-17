@@ -54,6 +54,7 @@ $( document ).ready(function() {
   var topUpAmountEl = $('#topUpAmount');
   var tiimAmountEl = $('#tiimAmount');
   var topUpBtnEl = $('#topUpBtn');
+  var topUpBackBtnEl = $('#topUpBackBtn');
   var successSectionEl = $('#successSection');
   var txUrlEl = $('#txUrl');
   var minimumVal = 10;
@@ -66,21 +67,30 @@ $( document ).ready(function() {
     emailEl.val('').focus();
   });
 
-  $('.topUpAmountBtn').on('click', function(){
-    var val = $(this).val();
-    var amount = val == "" ? minimumVal : parseInt((totalAmount * (parseFloat(val) / 100.0)) + 0.5);
-    if(amount < minimumVal) {
-      amount = minimumVal;
-    }
-    $(topUpAmountEl).val(amount);
-    $(topUpAmountEl).trigger('change');
-  });
+  function validateEmail(email) {
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  }
 
   $('#validateEmailBtn').on('click', function(){
+    emailEl.focus();
+
+    var email = emailEl.val();
+    if(email == '') {
+      validateEmailResultSectionEl.html('Please enter your Triip account email');
+      emailEl.focus();
+      return;
+    }
+
+    if(!validateEmail(email)) {
+      validateEmailResultSectionEl.html('Invalid email format');
+      emailEl.focus();
+      return;
+    }
+
     var $this = $(this);
     validateEmailResultSectionEl.html('');
     $this.attr('disabled', 'disabled').text('Processing...');
-    var email = emailEl.val();
 
     $.ajax({
       type: "POST",
@@ -128,9 +138,23 @@ $( document ).ready(function() {
       error: function(xhr, _){
         $this.attr('disabled', false).text('Submit');
         validateEmailResultSectionEl.html(xhr.responseJSON.message);
+        emailEl.focus();
+        return;
       },
       dataType: 'json'
     });
+
+    return;
+  });
+
+  $('.topUpAmountBtn').on('click', function(){
+    var val = $(this).val();
+    var amount = val == "" ? minimumVal : parseInt((totalAmount * (parseFloat(val) / 100.0)) + 0.5);
+    if(amount < minimumVal) {
+      amount = minimumVal;
+    }
+    $(topUpAmountEl).val(amount);
+    $(topUpAmountEl).trigger('change');
   });
 
   topUpAmountEl.on('change', function(){
@@ -142,6 +166,7 @@ $( document ).ready(function() {
 
   function topUpError(error){
     topUpBtnEl.attr('disabled', false).text('Submit');
+    topUpBackBtnEl.attr('disabled', false);
     topUpResultSectionEl.html(error.message ? error.message : error);
     topUpAmountEl.focus();
   }
@@ -183,6 +208,7 @@ $( document ).ready(function() {
   topUpBtnEl.on('click', function(){
     topUpResultSectionEl.html('');
     topUpBtnEl.attr('disabled', 'disabled').text('Processing...');
+    topUpBackBtnEl.attr('disabled', 'disabled');
 
     var errorMsg = resourceValid();
     if(errorMsg != '') {
@@ -230,6 +256,14 @@ $( document ).ready(function() {
       }, 3000);
     });
   });
+
+  topUpBackBtnEl.click(function(){
+    window.location.href = "/";
+  });
+
+  // $('#mailToContact').click(function(){
+  //   window.location.href = "mailto:contact@triip.me?Subject=Topup%20TIIM%20inquiry";
+  // });
 });
 
 Number.prototype.format = function(n, x, s, c) {
