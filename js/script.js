@@ -1,25 +1,42 @@
-// stag topUpContract: 0x05066b36e7a93322c34affa06c3822cac7321b8d
-// stag tiimContract: 0x9e2b6a4b95a02afa43e59963c062b8daa07dc20a
-// stag enpoint: https://staging.triip.me/api/dapp_browser/info
-
 // https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-methods
+var env = {
+  prod: {
+    getInfoByEmailApi: 'https://www.triip.me/api/dapp_browser/info',
+    tiimContractAddress: '0x4f7239c38d73a6cba675a3023cf84b304f6daef6',
+    topUpContractAddress: '0x689d961b4025c92201a837b2c175e3f16bed38a6'
+  },
+  stag: {
+    getInfoByEmailApi: 'https://staging.triip.me/api/dapp_browser/info',
+    tiimContractAddress: '0x9e2b6a4b95a02afa43e59963c062b8daa07dc20a',
+    topUpContractAddress: '0x05066b36e7a93322c34affa06c3822cac7321b8d'
+  },
+};
+
 var config = {
   api: {
-    getInfoByEmail: { url: 'https://www.triip.me/api/dapp_browser/info' }
+    getInfoByEmail: { url: env.prod.getInfoByEmailApi }
   },
   gasLimit: 2100000,
   gasPrice: 300000000,
   tiimContract: {
-    address: '0x4f7239c38d73a6cba675a3023cf84b304f6daef6',
+    address: env.prod.tiimContractAddress,
     abi: erc20ABI
   },
   topUpContract: {
-    address: '0x689d961b4025c92201a837b2c175e3f16bed38a6',
+    address: env.prod.topUpContractAddress,
     abi: topUpTiimABI
   }
-}
+};
 
 $( document ).ready(function() {
+  var envVal = location.href.getValueByKey('env');
+  if (location.href.getValueByKey('env') == 'stag') {
+    config.api.getInfoByEmail.url = env[envVal].getInfoByEmailApi;
+    config.tiimContract.address = env[envVal].tiimContractAddress;
+    config.topUpContract.address = env[envVal].topUpContractAddress;
+  }
+  console.log(config);
+
   var tiimContract = null;
   var emailEl = $('#email');
   var validateEmailSectionEl = $('#validateEmailSection');
@@ -77,27 +94,27 @@ $( document ).ready(function() {
 
         web3.eth.getBalance(web3.eth.defaultAccount, function(error, b) {
           totalAmount = web3.toBigNumber(b).dividedBy(1e+18).toNumber()
-          yourTomoBalanceEl.text(totalAmount);
+          yourTomoBalanceEl.text(totalAmount.format(2, 3, ',', '.'));
         });
 
         tiimContract = web3.eth.contract(config.tiimContract.abi).at(config.tiimContract.address);
         tiimContract.balanceOf(userWalletAddress, function(error, b){
-          userTiimBalanceEL.text(web3.toBigNumber(b).dividedBy(1e+18).toString());
+          userTiimBalanceEL.text(web3.toBigNumber(b).dividedBy(1e+18).toNumber().format(2, 3, ',', '.'));
         });
 
         tiimContract.balanceOf(web3.eth.defaultAccount, function(error, b){
-          yourTiimBalanceEl.text(web3.toBigNumber(b).dividedBy(1e+18).toString());
+          yourTiimBalanceEl.text(web3.toBigNumber(b).dividedBy(1e+18).toNumber().format(2, 3, ',', '.'));
         });
 
         var topupContract = web3.eth.contract(config.topUpContract.abi).at(config.topUpContract.address);
         topupContract.rate(function(error, b){
-          var rate = web3.toBigNumber(b).toString();
-          rateEl.text(rate);
+          var rate = web3.toBigNumber(b).toNumber();
+          rateEl.text(rate.format(2, 3, ',', '.'));
           tiimAmountEl.attr('rate', rate);
 
           topupContract.minimum(function(error, b){
             minimumVal = web3.toBigNumber(b).dividedBy(1e+18).toNumber();
-            minimumEl.text(minimumVal);
+            minimumEl.text(minimumVal.format(2, 3, ',', '.'));
             // topUpAmountEl.val(minimumVal);
             // topUpAmountEl.trigger('change');
             topUpBtnEl.attr('disabled', false);
@@ -117,7 +134,7 @@ $( document ).ready(function() {
     var rate = parseFloat(tiimAmountEl.attr('rate'));
     var val = parseFloat($(this).val());
     var tiimAmount  = rate * val;
-    tiimAmountEl.text(isNaN(tiimAmount) ? 0 : tiimAmount);
+    tiimAmountEl.text(isNaN(tiimAmount) ? 0 : tiimAmount.format(2, 3, ',', '.'));
   });
 
   function topUpError(error){
@@ -178,3 +195,14 @@ $( document ).ready(function() {
   });
 });
 
+Number.prototype.format = function(n, x, s, c) {
+  var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',
+      num = this.toFixed(Math.max(0, ~~n));
+
+  return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
+};
+
+String.prototype.getValueByKey = function (k) {
+    var p = new RegExp('\\b' + k + '\\b', 'gi');
+    return this.search(p) != -1 ? decodeURIComponent(this.substr(this.search(p) + k.length + 1).substr(0, this.substr(this.search(p) + k.length + 1).search(/(&|;|$)/))) : "";
+};
